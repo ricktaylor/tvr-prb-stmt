@@ -19,11 +19,11 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "Time Variant Routing Problem Statement"
+abbrev: "tvr-prb-stmt"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-taylor-tvr-prb-stmt-latest
 submissiontype: IETF  # also: "independent", "IAB", or "IRTF"
 number:
 date:
