@@ -1,0 +1,346 @@
+
+
+
+
+Time Variant Routing                                           R. Taylor
+Internet-Draft                                            Ori Industries
+Intended status: Informational                           24 October 2022
+Expires: 27 April 2023
+
+
+                 Time Variant Routing Problem Statement
+                    draft-taylor-tvr-prb-stmt-latest
+
+Abstract
+
+   Existing Routing Protocols expect to maintain contemporaneous, end-
+   to-end connected paths across a network.  Changes to that
+   connectivity, such as the loss of an adjacent peer, are considered to
+   be exceptional circumstances that must be corrected prior to the
+   resumption of data transmission.  Corrections may include attempting
+   to re-establish lost adjacencies and recalculating or rediscovering a
+   functional topology.
+
+   However, there are a growing number of use-cases where changes to the
+   routing topology are an expected part of network operations.  In
+   these cases the pre-planned loss and restoration of an adjacency, or
+   formation of an alternate adjacency, should be seen as a non-
+   disruptive event.
+
+   This document attempts to describe the problems perceived with
+   existing routing protocols and act as a "Problem Statement" to be
+   addressed by the proposed Time-Variant Routing (TVR) working group.
+
+   Readers are recommended to read this document alongside the TVR
+   (Time-Variant Routing) Use Cases (https://datatracker.ietf.org/doc/
+   draft-birrane-tvr-use-cases/).
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://ricktaylor.github.io/tvr-prb-stmt/draft-taylor-tvr-prb-
+   stmt.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-taylor-tvr-prb-stmt/.
+
+   Discussion of this document takes place on the Time Variant Routing
+   Working Group mailing list (mailto:tvr@ietf.org), which is archived
+   at https://mailarchive.ietf.org/arch/browse/tvr/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/tvr/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/ricktaylor/tvr-prb-stmt.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 27 April 2023.
+
+Copyright Notice
+
+   Copyright (c) 2022 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Disclaimer
+   4.  Behaviour of existing Routing Protocols
+     4.1.  Connectivity Loss
+     4.2.  Connectivity Gain
+   5.  Problems to Solve
+     5.1.  Adjacency Schedules
+     5.2.  Distributing Adjacency Schedules
+     5.3.  Executing Adjacency Schedules
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   Existing Routing Protocols expect to maintain contemporaneous, end-
+   to-end connected paths across a network.  Changes to that
+   connectivity, such as the loss of an adjacent peer, are considered to
+   be exceptional circumstances that must be corrected prior to the
+   resumption of data transmission.  Corrections may include attempting
+   to re-establish lost adjacencies and recalculating or rediscovering a
+   functional topology.
+
+   However, there are a growing number of use-cases where changes to the
+   routing topology are an expected part of network operations.  In
+   these cases the pre-planned loss and restoration of an adjacency, or
+   formation of an alternate adjacency, should be seen as a non-
+   disruptive event.
+
+   The expected loss (and planned resumption) of links can occur for a
+   variety of reasons.  In networks with mobile nodes, such as unmanned
+   aerial vehicles and some orbiting spacecraft constellations, links
+   are lost and re-established as a function of the mobility of the
+   platforms.  In networks without reliable access to power, such as
+   networks harvesting energy from wind and solar, link activity might
+   be restricted to certain times of day.  Similarly in networks
+   prioritizing green computing and energy efficiency over data rate,
+   network traffic might be planned around energy costs or expected user
+   data volumes.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Disclaimer
+
+   This document has been written rapidly, and a draft published prior
+   to any serious peer-review; it therefore may be factually incorrect
+   in its assumptions.  However, the author feels it is important to
+   begin this conversation in order to discover if there is merit in
+   examining the perceived issues detailed.
+
+4.  Behaviour of existing Routing Protocols
+
+   Since the dawn of the Internet, existing routing protocols have been
+   developed to ensure that end-to-end paths can be established for the
+   transmission of datagrams.  As the Internet began on academic and
+   research networks, the routing protocol designs have developed based
+   on assumptions about the characteristics of these early networks,
+   namely:
+
+   *  The individual nodes in a network do not move around.
+
+   *  The individual nodes are expected to be permanently available once
+      they join the network.
+
+   Issues with the first assumption have long been known, and have been
+   the subject of much research under the umbrella term Mobile Ad-hoc
+   Networks (MANET).  The IETF has had an active Working Group
+   attempting to standardise routing protocols specifically designed for
+   that use-case for many years, however the second assumption has been
+   largely ignored, and the result of this has been two-fold:
+
+   *  A number of routing protocols, such as BGP [RFC4271] and OSPF
+      [RFC2328], have been standardised for use in extremely stable
+      networks, where the loss of reachability to a node in the network
+      is considered an exceptional circumstance that requires some kind
+      of recovery mechanism, sometimes requiring some kind of global
+      recalculation of the topology.
+
+   *  A number of specialised MANET routing protocols, such as OLSR
+      [RFC7181] and AODV [RFC3561], have been standardised for use in
+      high-churn environments, where nodes move and disappear from the
+      network in unpredictable ways.  These protocols have novel
+      approaches to mitigate against the disruption caused by these
+      rapid unscheduled changes to the network topology.
+
+   However, the author believes there is a third issue with the
+   underlying assumptions that have driven routing protocol design to
+   date: There are use-cases where one or more nodes in the network may
+   become unreachable, or relocate within the current topology, at a
+   time known in advance of it happening.  The belief is that these use-
+   cases are not adequately satisfied by the current suite of routing
+   protocols.
+
+4.1.  Connectivity Loss
+
+   In both stable and MANET routing protocols, the loss of connectivity
+   to one or more nodes is seen by their peers as an erroneous
+   condition, and this has driven the focus of research into
+   increasingly sophisticated connectivity monitoring techniques,
+   ranging from simple timer-based "Hello" mechanisms, to rich
+   interaction with the link-layer, for example DLEP [RFC8175].  In all
+   cases these methods are designed to enable a router to promptly
+   detect an adjacency failure, completely ignoring the use-cases where
+   the timing of the failure is well-known in advance.
+
+   A second effect of treating peer-connectivity failures as exceptions
+   to the correct operation of a network is that mitigation for the loss
+   of the peer only begins once the adjacency failure has occurred.  If
+   the loss of connectivity is predictable, then the (possibly
+   expensive) route recalculations can have occurred well in advance of
+   the loss happening, and executed at the exact moment they are needed,
+   reducing disruption to the network as a whole.
+
+4.2.  Connectivity Gain
+
+   In the use-cases where loss of connectivity with a peer is a
+   predicted event, then often the start or resumption of connectivity
+   is also known in advance of it happening.  As with loss of
+   connectivity, existing protocols fall back to one or all of a set of
+   common mechanisms:
+
+   *  Timer-based polling of a previous adjacency, in case it came back.
+
+   *  Reliance on some link-layer notification mechanism.
+
+   *  Multicast-based discovery of unexpected new peers.
+
+   None of these mechanisms is particularly timely, as the expected
+   arrival or return of a peer is seen as an unexpected event.  When
+   connectivity with a potential peer is (re)established, generally a
+   full re-introduction to the routing topology is conducted, which can
+   be an expensive and potentially disruptive process.
+
+5.  Problems to Solve
+
+   What is not being proposed is the development of a new alternative
+   routing protocol to address the particular use case of expected
+   failure, for a number of reasons:
+
+   1.  Designing routing protocols is hard, and civilisation has many
+       good ones to chose from already.
+
+   2.  Even if some adjacency failures are predictable, others are not.
+       Any new routing protocol must still handle the case of unexpected
+       failure.
+
+   Therefore the suggestion is to augment existing protocols with the
+   capability to react to expected adjacency failure.
+
+   The author believes that the work on Time Variant Routing should be
+   focussed on solving the following problems.
+
+5.1.  Adjacency Schedules
+
+   In order to react to the expected failure and resumption of
+   connectivity to a peer, relevant nodes within the domain of a single
+   routing protocol instance must be made aware of the time and nature
+   of the expected change in connectivity.  This information is referred
+   to here as the Adjacency Schedule.
+
+   Although few protocols share an on-the-wire binary representation of
+   data, there are common constructs, such as an IP subnet, that all
+   protocols share.  We suggest that the same applies to an Adjacency
+   Schedule.  It should be perfectly possible to define in some generic
+   manner the structure and content of the data that describes a
+   schedule, and then map that content to the relevant wire format of
+   existing routing protocols.  A future IETF Time Variant Routing
+   Working Group should define a common data model for an Adjacency
+   Schedule, including the rules for correctly creating, updating and
+   deleting the content.
+
+5.2.  Distributing Adjacency Schedules
+
+   How an Adjacency Schedule is distributed amongst the peers of an
+   individual routing protocol instance is dependant on many factors
+   individual to each routing protocol, and a future IETF Time Variant
+   Routing Working Group must work with the relevant subject matter
+   experts, preferably a relevant IETF Working Group, in order to
+   standardise the optimal distribution of an Adjacency Schedule to the
+   correct peers for each routing protocol.
+
+5.3.  Executing Adjacency Schedules
+
+   Of course, just knowing about an Adjacency Schedule is insufficient,
+   changes in behaviour of routing protocols must be standardised such
+   that advantage can be taken of having prior knowledge of expected
+   changes in topology.  To achieve this a future IETF Time Variant
+   Routing Working Group should determine the set of actions that can be
+   scheduled, and then work with the relevant subject matter experts,
+   preferably a relevant IETF Working Group, in order to standardise the
+   execution of those actions, in the scope of each routing protocol.
+
+6.  Security Considerations
+
+   TODO Security
+
+7.  IANA Considerations
+
+   This document has no IANA actions.
+
+8.  References
+
+8.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+8.2.  Informative References
+
+   [RFC2328]  Moy, J., "OSPF Version 2", STD 54, RFC 2328,
+              DOI 10.17487/RFC2328, April 1998,
+              <https://www.rfc-editor.org/rfc/rfc2328>.
+
+   [RFC3561]  Perkins, C., Belding-Royer, E., and S. Das, "Ad hoc On-
+              Demand Distance Vector (AODV) Routing", RFC 3561,
+              DOI 10.17487/RFC3561, July 2003,
+              <https://www.rfc-editor.org/rfc/rfc3561>.
+
+   [RFC4271]  Rekhter, Y., Ed., Li, T., Ed., and S. Hares, Ed., "A
+              Border Gateway Protocol 4 (BGP-4)", RFC 4271,
+              DOI 10.17487/RFC4271, January 2006,
+              <https://www.rfc-editor.org/rfc/rfc4271>.
+
+   [RFC7181]  Clausen, T., Dearlove, C., Jacquet, P., and U. Herberg,
+              "The Optimized Link State Routing Protocol Version 2",
+              RFC 7181, DOI 10.17487/RFC7181, April 2014,
+              <https://www.rfc-editor.org/rfc/rfc7181>.
+
+   [RFC8175]  Ratliff, S., Jury, S., Satterwhite, D., Taylor, R., and B.
+              Berry, "Dynamic Link Exchange Protocol (DLEP)", RFC 8175,
+              DOI 10.17487/RFC8175, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8175>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Rick Taylor
+   Ori Industries
+   Email: rick.taylor@ori.co
