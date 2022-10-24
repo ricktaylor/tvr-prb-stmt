@@ -260,12 +260,12 @@ Table of Contents
    data, there are common constructs, such as an IP subnet, that all
    protocols share.  We suggest that the same applies to an Adjacency
    Schedule.  It should be perfectly possible to define in some generic
-   manner that shape and content of the data that describes a schedule,
-   and then map that content to the relevant wire format of existing
-   routing protocols.  A future IETF Time Variant Routing Working Group
-   should define a common data model for an Adjacency Schedule,
-   including the rules for correctly creating, updating and deleting the
-   content.
+   manner the structure and content of the data that describes a
+   schedule, and then map that content to the relevant wire format of
+   existing routing protocols.  A future IETF Time Variant Routing
+   Working Group should define a common data model for an Adjacency
+   Schedule, including the rules for correctly creating, updating and
+   deleting the content.
 
 5.2.  Distributing Adjacency Schedules
 
