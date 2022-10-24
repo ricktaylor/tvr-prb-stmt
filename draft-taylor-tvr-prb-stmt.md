@@ -109,7 +109,7 @@ The author believes that the work on Time Variant Routing should be focussed on 
 
 In order to react to the expected failure and resumption of connectivity to a peer, relevant nodes within the domain of a single routing protocol instance must be made aware of the time and nature of the expected change in connectivity.  This information is referred to here as the Adjacency Schedule.
 
-Although few protocols share an on-the-wire binary representation of data, there are common constructs, such as an IP subnet, that all protocols share.  We suggest that the same applies to an Adjacency Schedule.  It should be perfectly possible to define in some generic manner that shape and content of the data that describes a schedule, and then map that content to the relevant wire format of existing routing protocols.  A future IETF Time Variant Routing Working Group should define a common data model for an Adjacency Schedule, including the rules for correctly creating, updating and deleting the content.
+Although few protocols share an on-the-wire binary representation of data, there are common constructs, such as an IP subnet, that all protocols share.  We suggest that the same applies to an Adjacency Schedule.  It should be perfectly possible to define in some generic manner the structure and content of the data that describes a schedule, and then map that content to the relevant wire format of existing routing protocols.  A future IETF Time Variant Routing Working Group should define a common data model for an Adjacency Schedule, including the rules for correctly creating, updating and deleting the content.
 
 ## Distributing Adjacency Schedules
 
