@@ -9,19 +9,19 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Routing"
+workgroup: "Time Variant Routing"
 keyword:
  - next generation
  - unicorn
  - sparkling distributed ledger
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Time Variant Routing"
+  type: "Working Group"
+  mail: "tvr@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/tvr/"
+  github: "ricktaylor/tvr-prb-stmt"
+  latest: "https://ricktaylor.github.io/tvr-prb-stmt/draft-taylor-tvr-prb-stmt.html"
 
 author:
  -
